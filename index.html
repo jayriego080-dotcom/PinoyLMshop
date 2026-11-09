@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101522">
+  <title>PINOY LM SHOP</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><span class="logo">LM</span><span><b>PINOY LM SHOP</b><small>DIGITAL PRODUCTS & SERVICES</small></span></a>
+  <div class="top-right"><span id="topWallet" class="wallet hidden">₱0.00</span><button id="logoutBtn" class="btn ghost hidden">Log out</button></div>
+</header>
+
+<main class="container">
+  <section id="authView" class="auth card">
+    <h1>Welcome to PINOY LM SHOP</h1>
+    <p class="muted">Sign in or create your customer account.</p>
+    <div class="tabs">
+      <button class="tab active" data-auth-tab="login">Log in</button>
+      <button class="tab" data-auth-tab="signup">Create account</button>
+    </div>
+    <form id="loginForm">
+      <label>Email</label><input id="loginEmail" type="email" autocomplete="email" required>
+      <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
+      <button class="btn primary full">Log in</button>
+    </form>
+    <form id="signupForm" class="hidden">
+      <label>Full name</label><input id="signupName" required maxlength="100">
+      <label>WhatsApp / mobile number</label><input id="signupPhone" required maxlength="30">
+      <label>Email</label><input id="signupEmail" type="email" autocomplete="email" required>
+      <label>Password (at least 6 characters)</label><input id="signupPassword" type="password" minlength="6" autocomplete="new-password" required>
+      <button class="btn primary full">Create account</button>
+    </form>
+    <p id="authMessage" class="message" aria-live="polite"></p>
+    <p class="tiny">By creating an account, you acknowledge that digital bot applications are third-party services and may carry account risks.</p>
+  </section>
+
+  <section id="appView" class="hidden">
+    <div class="welcome-row">
+      <div><span class="muted">Welcome back</span><h2 id="welcomeName">Customer</h2><span id="welcomeEmail" class="tiny"></span></div>
+      <span id="rolePill" class="pill">CUSTOMER</span>
+    </div>
+    <nav class="nav" id="mainNav">
+      <button class="active" data-page="dashboard">Dashboard</button>
+      <button data-page="shop">Shop</button>
+      <button data-page="wallet">Wallet</button>
+      <button data-page="orders">My orders</button>
+      <button data-page="subscriptions">Subscriptions</button>
+      <button data-page="admin" id="adminNav" class="hidden">Admin</button>
+    </nav>
+
+    <section id="page-dashboard" class="page active">
+      <div class="stats">
+        <article class="card"><span class="muted">Wallet balance</span><strong id="dashBalance">₱0.00</strong><button class="btn secondary" data-go="wallet">Add balance</button></article>
+        <article class="card"><span class="muted">My orders</span><strong id="dashOrders">0</strong><button class="btn secondary" data-go="orders">View orders</button></article>
+      </div>
+      <article class="card notice"><b>Customer reminder</b><p>Some bot products use third-party applications. Use them at your own discretion and understand that game/account restrictions may apply.</p></article>
+      <article class="card"><h3>Need help?</h3><p class="muted">WhatsApp customer support</p><a class="btn primary inline" href="https://wa.me/639279322948" target="_blank" rel="noopener">Chat with PINOY LM SHOP</a></article>
+    </section>
+
+    <section id="page-shop" class="page">
+      <div class="section-head"><div><h2>Shop products</h2><p class="muted">Available products and current prices.</p></div><button class="btn secondary" id="refreshProducts">Refresh</button></div>
+      <div id="productList" class="product-grid"><p class="muted">Loading products…</p></div>
+    </section>
+
+    <section id="page-wallet" class="page">
+      <article class="card">
+        <span class="muted">Available wallet balance</span><strong id="walletBalance" class="big-balance">₱0.00</strong>
+        <h3>Request a wallet top-up</h3>
+        <p class="muted">Minimum top-up: ₱500. Send payment to the GCash account below, then upload your transaction screenshot. Admin approval is required before crediting.</p>
+        <div class="payment-box"><b>GCash: 09279322948</b><span>Account name: J** M** R.</span></div>
+        <form id="topupForm">
+          <label>Amount (₱)</label><input id="topupAmount" type="number" min="500" step="1" required>
+          <label>Sender name</label><input id="senderName" required maxlength="100">
+          <label>Sender GCash / account number</label><input id="senderAccount" required maxlength="50">
+          <label>Reference number</label><input id="referenceNumber" required maxlength="100">
+          <label>Payment screenshot</label><input id="proofFile" type="file" accept="image/*" required>
+          <button class="btn primary">Submit top-up for review</button>
+        </form>
+      </article>
+      <article class="card"><h3>My top-up requests</h3><div id="myTopups" class="list"><p class="muted">Loading…</p></div></article>
+      <article class="card"><h3>Wallet activity</h3><div id="walletActivity" class="list"><p class="muted">Loading…</p></div></article>
+    </section>
+
+    <section id="page-orders" class="page">
+      <h2>My orders</h2><div id="myOrders" class="list"><p class="muted">Loading…</p></div>
+    </section>
+
+    <section id="page-subscriptions" class="page">
+      <h2>My subscriptions</h2><p class="muted">Manage automatic wallet renewal for eligible subscriptions.</p>
+      <div id="mySubscriptions" class="list"><p class="muted">Loading…</p></div>
+    </section>
+
+    <section id="page-admin" class="page">
+      <div class="section-head"><div><h2>Admin dashboard</h2><p class="muted">Admin-only data and actions.</p></div><button class="btn secondary" id="adminRefresh">Refresh</button></div>
+      <div class="stats">
+        <article class="card"><span class="muted">Customers</span><strong id="adminCustomerCount">—</strong></article>
+        <article class="card"><span class="muted">Pending top-ups</span><strong id="adminPendingCount">—</strong></article>
+      </div>
+      <article class="card"><h3>Pending top-ups</h3><div id="adminTopups" class="list">Loading…</div></article>
+      <article class="card"><h3>Customer accounts</h3><div id="adminCustomers" class="list">Loading…</div></article>
+      <article class="card"><h3>Add product</h3>
+        <form id="addProductForm" class="form-grid">
+          <div><label>Product name</label><input id="newProductName" required></div>
+          <div><label>Category</label><input id="newProductCategory" value="RSS" required></div>
+          <div><label>Price (₱)</label><input id="newProductPrice" type="number" min="0" step="0.01" required></div>
+          <div><label>Product type</label><select id="newProductType"><option value="code">RSS / code</option><option value="subscription">Bot subscription</option><option value="service">Setup / service</option></select></div>
+          <div class="wide"><label>Description</label><textarea id="newProductDescription" rows="2"></textarea></div>
+          <div><label>Duration (days, subscriptions)</label><input id="newProductDuration" type="number" min="1"></div>
+          <div><label>Supplier cost (USD, optional)</label><input id="newProductCost" type="number" min="0" step="0.01"></div>
+          <div><label>Exchange rate (optional)</label><input id="newProductRate" type="number" min="0" step="0.01" value="64"></div>
+          <button class="btn primary">Save product</button>
+        </form>
+      </article>
+      <article class="card"><h3>Add RSS inventory code</h3>
+        <form id="addStockForm">
+          <label>Product</label><select id="stockProduct" required></select>
+          <label>RSS code</label><textarea id="stockCode" required rows="3"></textarea>
+          <button class="btn primary">Add to stock</button>
+        </form>
+      </article>
+    </section>
+    <p id="appMessage" class="message" aria-live="polite"></p>
+  </section>
+</main>
+<footer>© PINOY LM SHOP • Philippines 🇵🇭</footer>
+<script src="script.js"></script>
+</body>
+</html>
