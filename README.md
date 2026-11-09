@@ -1,2 +1,1 @@
-# PinoyLMshop
-Lords mobile shop
+
